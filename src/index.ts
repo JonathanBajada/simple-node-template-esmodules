@@ -1,9 +1,10 @@
+import 'express-async-errors'
 import * as dotenv from 'dotenv'
 dotenv.config()
 import express from 'express'
 const app = express()
 import morgan from 'morgan'
-import { nanoid } from 'nanoid'
+import mongoose from 'mongoose'
 
 import jobRouter from '../routes/jobRouter.js'
 if (process.env.NODE_ENV === 'development') {
@@ -36,6 +37,13 @@ app.use((error, req, res, next) => {
 
 const port = process.env.PORT || 5100
 
-app.listen(port, () => {
-	console.log(`server is running on PORT ${port}...`)
-})
+// Connect mongodb
+try {
+	await mongoose.connect(process.env.MONGO_URL)
+	app.listen(port, () => {
+		console.log(`server is running on PORT ${port}...`)
+	})
+} catch (error) {
+	console.log(error)
+	process.exit(1)
+}
